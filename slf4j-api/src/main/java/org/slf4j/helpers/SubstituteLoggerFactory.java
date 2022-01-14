@@ -48,6 +48,7 @@ public class SubstituteLoggerFactory implements ILoggerFactory {
 
     final LinkedBlockingQueue<SubstituteLoggingEvent> eventQueue = new LinkedBlockingQueue<>();
 
+    @Override
     synchronized public Logger getLogger(String name) {
         SubstituteLogger logger = loggers.get(name);
         if (logger == null) {

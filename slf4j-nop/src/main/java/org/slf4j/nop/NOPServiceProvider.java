@@ -38,6 +38,7 @@ public class NOPServiceProvider implements SLF4JServiceProvider {
         return REQUESTED_API_VERSION;
     }
 
+    @Override
     public void initialize() {
 
     }

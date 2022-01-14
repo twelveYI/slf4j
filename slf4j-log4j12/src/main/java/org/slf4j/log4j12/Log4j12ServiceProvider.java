@@ -23,6 +23,7 @@ public class Log4j12ServiceProvider implements SLF4JServiceProvider {
 
     public Log4j12ServiceProvider() {
         try {
+            // 通过版本新增的字段，判断版本信息； 但是，为什么没有禁用低版本呢？
             @SuppressWarnings("unused")
             Level level = Level.TRACE;
         } catch (NoSuchFieldError nsfe) {

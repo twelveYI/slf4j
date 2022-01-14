@@ -147,8 +147,10 @@ public final class LoggerFactory {
             List<SLF4JServiceProvider> providersList = findServiceProviders();
             reportMultipleBindingAmbiguity(providersList);
             if (providersList != null && !providersList.isEmpty()) {
+                // 如果同时依赖了log4j和logback，那么是随机选择一个，就有了不确定性。 需要排包。
                 PROVIDER = providersList.get(0);
                 // SLF4JServiceProvider.initialize() is intended to be called here and nowhere else.
+                // 接口中定义的方法，这里调用实现类的具体初始化逻辑。接口定义的钩子方法。
                 PROVIDER.initialize();
                 INITIALIZATION_STATE = SUCCESSFUL_INITIALIZATION;
                 reportActualBinding(providersList);

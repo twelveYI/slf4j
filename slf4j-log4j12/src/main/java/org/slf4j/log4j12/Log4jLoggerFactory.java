@@ -45,6 +45,8 @@ public class Log4jLoggerFactory implements ILoggerFactory {
     // check for delegation loops
     static {
         try {
+            // 反桥接器：log4j-over-slf4j.jar
+            // 同时存在两个相反的桥接器，会死循环，所以抛异常。
             Class.forName("org.apache.log4j.Log4jLoggerFactory");
             String part1 = "Detected both log4j-over-slf4j.jar AND bound slf4j-log4j12.jar on the class path, preempting StackOverflowError. ";
             String part2 = "See also " + LOG4J_DELEGATION_LOOP_URL + " for more details.";
@@ -63,6 +65,7 @@ public class Log4jLoggerFactory implements ILoggerFactory {
     public Log4jLoggerFactory() {
         loggerMap = new ConcurrentHashMap<>();
         // force log4j to initialize
+        // todo ？
         org.apache.log4j.LogManager.getRootLogger();
     }
 
@@ -71,17 +74,20 @@ public class Log4jLoggerFactory implements ILoggerFactory {
      * 
      * @see org.slf4j.ILoggerFactory#getLogger(java.lang.String)
      */
+    @Override
     public Logger getLogger(String name) {
         Logger slf4jLogger = loggerMap.get(name);
         if (slf4jLogger != null) {
             return slf4jLogger;
         } else {
             org.apache.log4j.Logger log4jLogger;
-            if (name.equalsIgnoreCase(Logger.ROOT_LOGGER_NAME))
+            if (name.equalsIgnoreCase(Logger.ROOT_LOGGER_NAME)) {
                 log4jLogger = LogManager.getRootLogger();
-            else
+            } else {
                 log4jLogger = LogManager.getLogger(name);
+            }
 
+            // 适配器实例的构造器参数，为被适配的对象实例。
             Logger newInstance = new Log4jLoggerAdapter(log4jLogger);
             Logger oldInstance = loggerMap.putIfAbsent(name, newInstance);
             return oldInstance == null ? newInstance : oldInstance;
